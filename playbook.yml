@@ -11,12 +11,12 @@
 
     - name: Copy tzupdater.jar to the Docker container
       copy:
-        src: files/tzupdater.jar
+        src: tzupdater.jar
         dest: /home/support/tzupdater.jar
 
     - name: Copy tzdata2019c.tar.gz to the Docker container {{container_id}}
       copy:
-        src: files/tzdata2019c.tar.gz
+        src: tzdata2019c.tar.gz
         dest: /home/support/tzdata2019c.tar.gz
 
     - name: copy tzdata into container {{container_id}}
