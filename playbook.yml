@@ -1,29 +1,36 @@
 ---
 - name: Copy file into Docker container and execute command
-  hosts: local 
-  become: true  
+  hosts: local
+  become: true
+  vars:
+    container_name: "dispatch"            # The name of the Docker container
+    src_tzupdater: "tzupdater.jar"        # The source path for tzupdater.jar
+    src_tzdata: "tzdata2024a.tar.gz"      # The source path for tzdata2019c.tar.gz
+    dest_dir: "/home/support"             # Destination directory inside the host
+    container_dest_dir: "/tmp"            # Destination directory inside the container
+
   tasks:
 
     - name: Get the container ID of the running Docker container
-      shell: docker ps -qf "name=dispatch"
+      shell: docker ps -qf "name={{ container_name }}"
       register: container_id
       changed_when: false
 
-    - name: Copy tzupdater.jar to the Docker container
+    - name: Copy tzupdater.jar to the host
       copy:
-        src: tzupdater.jar
-        dest: /home/support/tzupdater.jar
+        src: "{{ src_tzupdater }}"
+        dest: "{{ dest_dir }}/{{ src_tzupdater }}"
 
-    - name: Copy tzdata2019c.tar.gz to the Docker container {{container_id}}
+    - name: Copy tzdata2019c.tar.gz to the host
       copy:
-        src: tzdata2019c.tar.gz
-        dest: /home/support/tzdata2019c.tar.gz
+        src: "{{ src_tzdata }}"
+        dest: "{{ dest_dir }}/{{ src_tzdata }}"
 
-    - name: copy tzdata into container {{container_id}}
-      shell: docker cp /home/support/tzupdater.jar {{container_id}}:/tmp/
-   
-    - name: copy tzdata into container {{container_id}}
-      shell: docker cp /home/support/tzdata2019c.tar.gz {{container_id}}:/tmp/
-    
-    - name: Execute Java command in Docker container {{container_id}}
-      shell: docker exec -it {{container_id}} sh -c "java -jar /tmp/tzupdater.jar -v -f -l file:/tmp/tzdata2019c.tar.gz"
+    - name: Copy tzupdater.jar into Docker container {{ container_id.stdout }}
+      shell: docker cp {{ dest_dir }}/{{ src_tzupdater }} {{ container_id.stdout }}:{{ container_dest_dir }}/
+
+    - name: Copy tzdata2019c.tar.gz into Docker container {{ container_id.stdout }}
+      shell: docker cp {{ dest_dir }}/{{ src_tzdata }} {{ container_id.stdout }}:{{ container_dest_dir }}/
+
+    - name: Execute Java command in Docker container {{ container_id.stdout }}
+      shell: docker exec -it {{ container_id.stdout }} sh -c "java -jar {{ container_dest_dir }}/{{ src_tzupdater }} -v -f -l file:{{ container_dest_dir }}/{{ src_tzdata }}"
