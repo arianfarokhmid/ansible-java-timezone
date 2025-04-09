@@ -1,6 +1,6 @@
 latest time zone : https://data.iana.org/time-zones/releases/
 
-***bash
+```bash
 date +%Y
 year=$(date +%Y)
 curl https://data.iana.org/time-zones/releases/tzdata$((year + 1))a.tar.gz
@@ -10,4 +10,4 @@ if [ $? -eq 0 ];
 else
   echo  "time zone is up to dated" 
 fi
-***
+```
