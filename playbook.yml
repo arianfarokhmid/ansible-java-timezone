@@ -21,7 +21,7 @@
         src: "{{ src_tzupdater }}"
         dest: "{{ dest_dir }}/{{ src_tzupdater }}"
 
-    - name: Copy tzdata2019c.tar.gz to the host
+    - name: Copy {{ src_tzdata }} to the host
       copy:
         src: "{{ src_tzdata }}"
         dest: "{{ dest_dir }}/{{ src_tzdata }}"
@@ -29,7 +29,7 @@
     - name: Copy tzupdater.jar into Docker container {{ container_id.stdout }}
       shell: docker cp {{ dest_dir }}/{{ src_tzupdater }} {{ container_id.stdout }}:{{ container_dest_dir }}/
 
-    - name: Copy tzdata2019c.tar.gz into Docker container {{ container_id.stdout }}
+    - name: Copy {{ src_tzdata }} into Docker container {{ container_id.stdout }}
       shell: docker cp {{ dest_dir }}/{{ src_tzdata }} {{ container_id.stdout }}:{{ container_dest_dir }}/
 
     - name: Execute Java command in Docker container {{ container_id.stdout }}
